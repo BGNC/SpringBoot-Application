@@ -1,6 +1,8 @@
 package io.bgnc.SpringBootApplication.controller;
 
+import io.bgnc.SpringBootApplication.dto.AuthenticationResponse;
 import io.bgnc.SpringBootApplication.dto.RegisterRequest;
+import io.bgnc.SpringBootApplication.dto.loginRequest;
 import io.bgnc.SpringBootApplication.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,12 @@ public class AuthController {
     public ResponseEntity<String> verificationAccount(@PathVariable String token){
         authService.verifyAccount(token);
         return new ResponseEntity<>("User activated successfully",HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public AuthenticationResponse login(@RequestBody loginRequest loginRequest){
+        return authService.login(loginRequest);
+
     }
 
 }

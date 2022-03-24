@@ -13,16 +13,19 @@ import java.time.Instant;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
-@Data
-@Entity
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Builder
+@Data
+
 public class Post {
+
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long postId;
-    @NotBlank(message = "Post Name cannot be empty or Null")
+    @NotBlank(message = "name of post cannot be null or empty")
     private String postName;
     @Nullable
     private String url;

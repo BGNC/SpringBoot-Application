@@ -1,13 +1,20 @@
 package io.bgnc.SpringBootApplication.service;
 
+import io.bgnc.SpringBootApplication.dto.AuthenticationResponse;
 import io.bgnc.SpringBootApplication.dto.RegisterRequest;
+import io.bgnc.SpringBootApplication.dto.loginRequest;
 import io.bgnc.SpringBootApplication.exceptions.SpringBootApplicationException;
 import io.bgnc.SpringBootApplication.model.NotificationEmail;
 import io.bgnc.SpringBootApplication.model.User;
 import io.bgnc.SpringBootApplication.model.VerificationToken;
 import io.bgnc.SpringBootApplication.repository.UserRepository;
 import io.bgnc.SpringBootApplication.repository.VerificationTokenRepository;
+import io.bgnc.SpringBootApplication.security.Jwt;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +36,10 @@ public class AuthService {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
+    private final AuthenticationManager authenticationManager;
+    private final Jwt jwt;
+
+
 
     @Transactional
     public void signup(RegisterRequest registerRequest){
@@ -86,6 +97,21 @@ public class AuthService {
 
         user.setEnabled(true);
         userRepository.save(user);
+
+    }
+
+    public AuthenticationResponse login(loginRequest loginRequest) {
+
+        Authentication authenticate  = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(),
+                loginRequest.getPassword()));
+
+
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        String token = jwt.generateToken(authenticate);
+
+        return new AuthenticationResponse(token,loginRequest.getUsername());
 
     }
 }

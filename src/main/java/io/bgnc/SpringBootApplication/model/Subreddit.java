@@ -22,9 +22,9 @@ public class Subreddit {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
-    @NotBlank(message = "Community name is required")
+    @NotBlank(message = "community name is req.")
     private String name;
-    @NotBlank(message = "Description is required")
+    @NotBlank(message = "Desc is req.")
     private String description;
     @OneToMany(fetch = LAZY)
     private List<Post> posts;
