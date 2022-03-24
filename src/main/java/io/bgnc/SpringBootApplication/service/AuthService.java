@@ -1,6 +1,7 @@
 package io.bgnc.SpringBootApplication.service;
 
 import io.bgnc.SpringBootApplication.dto.RegisterRequest;
+import io.bgnc.SpringBootApplication.model.NotificationEmail;
 import io.bgnc.SpringBootApplication.model.User;
 import io.bgnc.SpringBootApplication.model.VerificationToken;
 import io.bgnc.SpringBootApplication.repository.UserRepository;
@@ -19,7 +20,6 @@ import java.util.UUID;
 public class AuthService {
 
     @Autowired
-
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -28,6 +28,8 @@ public class AuthService {
     @Autowired
     private final VerificationTokenRepository verificationTokenRepository;
 
+
+    private final MailService mailService;
     @Transactional
     public void signup(RegisterRequest registerRequest){
 
@@ -49,6 +51,8 @@ public class AuthService {
 
        String token =  generateVerificationToken(user);
 
+       mailService.sendMail(new NotificationEmail("Please ! Activate your email address", user.getEmail(),"Thank you click on the below url to activate your email " +
+               "http://localhost:8080/api/auth/accountVerification/"+token ));
     }
 
     private String generateVerificationToken(User user) {
