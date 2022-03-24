@@ -1,18 +1,20 @@
 package io.bgnc.SpringBootApplication;
 
-import io.bgnc.SpringBootApplication.config.SwaggerConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @SpringBootApplication
 @EnableAsync
-@Import(SwaggerConfiguration.class)
 public class Application {
 
 	public static void main(String[] args) {
+		System.setProperty("server.port","8080");
+
 		SpringApplication.run(Application.class, args);
 	}
+
+
 
 }

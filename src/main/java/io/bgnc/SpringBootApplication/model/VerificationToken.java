@@ -11,11 +11,18 @@ import java.time.Instant;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
+
+//@Getter
+//@Setter
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+/**
+ * Table name in database
+ */
 @Table(name="token")
+
 public class VerificationToken {
     @Id
     @GeneratedValue(strategy = IDENTITY)

@@ -15,8 +15,7 @@ import java.time.Instant;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
-@Getter
-@Setter
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
