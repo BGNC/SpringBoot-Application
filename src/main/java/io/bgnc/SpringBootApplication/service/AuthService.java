@@ -1,6 +1,7 @@
 package io.bgnc.SpringBootApplication.service;
 
 import io.bgnc.SpringBootApplication.dto.RegisterRequest;
+import io.bgnc.SpringBootApplication.exceptions.SpringBootApplicationException;
 import io.bgnc.SpringBootApplication.model.NotificationEmail;
 import io.bgnc.SpringBootApplication.model.User;
 import io.bgnc.SpringBootApplication.model.VerificationToken;
@@ -13,19 +14,21 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class AuthService {
 
-    @Autowired
-    private final PasswordEncoder passwordEncoder;
+    /**
+     * We don't need to write @Autowired because we added the AllArgsConstructor,
+     * so it  can find easily that types or repos.
+     */
 
-    @Autowired
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
-    @Autowired
     private final VerificationTokenRepository verificationTokenRepository;
 
 
@@ -64,6 +67,28 @@ public class AuthService {
 
         verificationTokenRepository.save(verificationToken);
         return token;
+
+    }
+
+    public void verifyAccount(String token) {
+        Optional<VerificationToken> verificationToken=verificationTokenRepository.findByToken(token);
+
+        verificationToken.orElseThrow(()-> new SpringBootApplicationException("Invalid Token"));
+
+        fetchUserAndEnable(verificationToken.get());
+
+    }
+
+
+    private void fetchUserAndEnable(VerificationToken verificationToken) {
+
+        String username  = verificationToken.getUser().getUsername();
+
+        User user = userRepository.findByUsername(username).
+                orElseThrow(()->new SpringBootApplicationException("Entered username could not found "+username));
+
+        user.setEnabled(true);
+        userRepository.save(user);
 
     }
 }

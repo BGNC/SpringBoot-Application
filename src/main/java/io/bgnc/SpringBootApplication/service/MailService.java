@@ -8,6 +8,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,10 +18,19 @@ public class MailService {
 
 
     private final JavaMailSender mailSender;
-    private MailContentBuilder mailContentBuilder;
+    private final MailContentBuilder mailContentBuilder;
 
 
+    /**
+     * In order to reduce the time taken while the user is registering,
+     * it is aimed to run the program more effectively by running the program asynchronously.
+     * In this way, a decrease in time was observed.
+     * @param notificationEmail
+     * @throws SpringBootApplicationException
+     */
 
+    // AJAX
+    @Async
     public void sendMail(NotificationEmail notificationEmail) throws SpringBootApplicationException {
         MimeMessagePreparator messagePreparator  = mimeMessage -> {
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
