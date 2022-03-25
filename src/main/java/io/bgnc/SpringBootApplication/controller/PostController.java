@@ -26,7 +26,8 @@ public class PostController {
     public ResponseEntity<Void> createPost(@RequestBody PostRequest postRequest) throws SubredditNotFoundException {
         postService.save(postRequest);
         /**
-         * CREATED = 200
+         * CREATED = 201
+         *
          */
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
