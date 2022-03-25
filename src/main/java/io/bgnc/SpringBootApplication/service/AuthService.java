@@ -11,14 +11,17 @@ import io.bgnc.SpringBootApplication.repository.UserRepository;
 import io.bgnc.SpringBootApplication.repository.VerificationTokenRepository;
 import io.bgnc.SpringBootApplication.security.Jwt;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -64,6 +67,15 @@ public class AuthService {
 
        mailService.sendMail(new NotificationEmail("Please ! Activate your email address", user.getEmail(),"Thank you click on the below url to activate your email " +
                "http://localhost:8080/api/auth/accountVerification/"+token ));
+    }
+
+
+    @Transactional(readOnly = true)
+    public User getCurrentUser() {
+        Jwt principal = (Jwt) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal();
+        return userRepository.findByUsername(principal.getSubject())
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getSubject()));
     }
 
     private String generateVerificationToken(User user) {
@@ -113,5 +125,10 @@ public class AuthService {
 
         return new AuthenticationResponse(token,loginRequest.getUsername());
 
+    }
+
+    public boolean isLoggedIn() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
     }
 }
