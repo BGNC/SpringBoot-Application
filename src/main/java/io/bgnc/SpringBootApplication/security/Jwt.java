@@ -2,6 +2,7 @@ package io.bgnc.SpringBootApplication.security;
 
 import io.bgnc.SpringBootApplication.exceptions.SpringBootApplicationException;
 import io.bgnc.SpringBootApplication.model.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
+
+import static io.jsonwebtoken.Jwts.parser;
 
 @Service
 @RequiredArgsConstructor
@@ -52,5 +55,30 @@ public class Jwt {
             throw new SpringBootApplicationException("Exception thrown");
         }
 
+    }
+
+    public boolean validateToken(String jwt){
+        parser()
+                .setSigningKey(getPublicKey())
+                .parseClaimsJws(jwt);
+        return true;
+    }
+
+    /**
+     * Copy of private key
+     * @return
+     */
+    private PublicKey getPublicKey(){
+        try {
+            return keyStore.getCertificate("springblog").getPublicKey();
+        } catch (KeyStoreException e) {
+            throw new SpringBootApplicationException("Exception occured while retrieved public key ");
+        }
+    }
+
+    public String getUsernameFromJwt(String token){
+
+        Claims claims = parser().setSigningKey(getPublicKey()).parseClaimsJws(token).getBody();
+        return claims.getSubject();
     }
 }
