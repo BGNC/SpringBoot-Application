@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/subreddit")
 
@@ -32,8 +34,8 @@ public class SubredditController {
     }
 
     @GetMapping
-    public void getAllSubreddits(){
-        ResponseEntity.status(HttpStatus.OK).body(subredditService.getAll());
+    public ResponseEntity<List<SubredditDto>> getAllSubreddits(){
+        return ResponseEntity.status(HttpStatus.OK).body(subredditService.getAll());
 
 
     }
