@@ -29,17 +29,17 @@ public class CommentsController {
 
     }
 
-    @GetMapping
+    @GetMapping("/by-post/{postId}")
     public ResponseEntity<List<CommentsDto>> getAllCommentsForPost(@PathVariable Long postId) throws PostFoundNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(commentService.getAllCommentsForPost(postId));
     }
 
 
-    @GetMapping
-    public void getAllCommentsForUser(String username){
+    @GetMapping("/by-user/{username}")
+    public ResponseEntity<List<CommentsDto>> getAllCommentsForUser(@PathVariable String username){
 
-        commentService.getAllCommentsForUser(username);
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getAllCommentsForUser(username));
 
 
     }

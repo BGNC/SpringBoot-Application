@@ -13,6 +13,7 @@ import io.bgnc.SpringBootApplication.repository.UserRepository;
 import lombok.AllArgsConstructor;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -70,10 +71,14 @@ public class CommentService {
     }
 
 
-    public void getAllCommentsForUser(String username) {
+    public List<CommentsDto> getAllCommentsForUser(String username) {
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(()->)
+                .orElseThrow(()->new UsernameNotFoundException(username));
+        return commentRepository.findAllByUser(String.valueOf(user))
+                .stream()
+                .map(commentMapper::mapToDto)
+                .collect(Collectors.toList());
 
     }
 }
