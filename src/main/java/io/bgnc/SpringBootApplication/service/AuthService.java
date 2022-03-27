@@ -1,6 +1,7 @@
 package io.bgnc.SpringBootApplication.service;
 
 import io.bgnc.SpringBootApplication.dto.AuthenticationResponse;
+import io.bgnc.SpringBootApplication.dto.RefreshTokenRequest;
 import io.bgnc.SpringBootApplication.dto.RegisterRequest;
 import io.bgnc.SpringBootApplication.dto.loginRequest;
 import io.bgnc.SpringBootApplication.exceptions.SpringBootApplicationException;
@@ -41,6 +42,8 @@ public class AuthService {
     private final MailService mailService;
     private final AuthenticationManager authenticationManager;
     private final Jwt jwt;
+
+    private final RefreshTokenService refreshTokenService;
 
 
 
@@ -123,12 +126,35 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwt.generateToken(authenticate);
 
-        return new AuthenticationResponse(token,loginRequest.getUsername());
+        return AuthenticationResponse.builder()
+                .authenticationToken(token)
+                .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+                .expiresAt(Instant.now().plusMillis(jwt.getJwtExpirationInMillis()))
+                .username(loginRequest.getUsername())
+                .build();
+
+
 
     }
 
     public boolean isLoggedIn() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
+    }
+
+    public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+
+         refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+
+         String token = jwt.generateTokenWithUsername(refreshTokenRequest.getUsername());
+
+
+         return AuthenticationResponse.builder()
+                 .authenticationToken(token)
+                 .refreshToken(refreshTokenRequest.getRefreshToken())
+                 .expiresAt(Instant.now().plusMillis(jwt.getJwtExpirationInMillis()))
+                 .username(refreshTokenRequest.getUsername())
+                 .build();
+
     }
 }

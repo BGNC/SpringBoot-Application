@@ -5,6 +5,7 @@ import io.bgnc.SpringBootApplication.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.sql.Date;
+import java.time.Instant;
 
 import static io.jsonwebtoken.Jwts.parser;
 
@@ -22,6 +25,9 @@ public class Jwt {
 
 
     private KeyStore keyStore;
+    @Value(value = "${jwt.expiration.time}")
+    private Long jwtExpirationInMillis;
+
 
     @PostConstruct
     public void init() {
@@ -43,6 +49,19 @@ public class Jwt {
         return Jwts.builder().
                 setSubject(principalOfUser.getUsername())
                 .signWith(getPrivateKey())
+                .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
+                .compact();
+
+    }
+
+    public String generateTokenWithUsername(String username){
+
+
+        return Jwts.builder().
+                setSubject(username)
+                .setIssuedAt(java.util.Date. from(Instant.now()))
+                .signWith(getPrivateKey())
+                .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
                 .compact();
 
     }
@@ -78,7 +97,14 @@ public class Jwt {
 
     public String getUsernameFromJwt(String token){
 
-        Claims claims = parser().setSigningKey(getPublicKey()).parseClaimsJws(token).getBody();
+        Claims claims = parser().
+                setSigningKey(getPublicKey()).
+                parseClaimsJws(token).
+                getBody();
+
         return claims.getSubject();
+    }
+    public Long getJwtExpirationInMillis(){
+        return this.jwtExpirationInMillis;
     }
 }
